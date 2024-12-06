@@ -1,0 +1,187 @@
+blockquote, body, dd, dl, dt, fieldset, figure, h1, h2, h3, h4, h5, h6, hr, html, iframe, legend, li, ol, p, pre, textarea, ul, a {margin:0;padding:0}
+ul {list-style:none}
+button, input, select {margin:0}
+input{padding:0}
+html {box-sizing:border-box}
+*, :after, :before {box-sizing:inherit}
+img, video {height:auto;max-width:100%}
+iframe {border:0}
+table {border-collapse:collapse;border-spacing:0}
+td, th {padding:0}
+/* ---위에 reset css살짝 커스텀--- */
+
+main{
+    display: flex;
+    height: 100vh;
+}
+
+nav{
+    background-color: #fbfbfa;
+    padding-top: 10px;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    border-right: solid 1px #ebebeb;
+    color:#6D6C68;
+    font-size: 14px;
+    font-weight: 450;
+    overflow-y: auto;
+}
+.thick-border{
+    border-right: solid 3px #e1e1e1;
+
+}
+.document-list-header{
+    display: flex;
+    justify-content: left;
+    padding-left:15px;
+    color:#3d3d3d;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+.document-list-header>svg{
+    width:20px;
+    height:20px;
+    margin-right: 10px;
+}
+a:visited, a:link {
+    text-decoration: none;
+    color:#6D6C68;
+    font-size: 14px;
+    font-weight: 450;
+}
+button{
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+}
+button:hover{
+    background-color:#dddddc;
+}
+.document-item{
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap; /* 텍스트 줄 바꿈 금지 */
+    overflow: hidden; /* 넘치는 부분 숨김 */
+}
+.document-item-inner{
+    margin: 4px;
+    display: flex;
+    height: 24px;
+    min-width: 242px;
+    border-radius: 3px;
+    cursor: pointer;
+    align-items: center;
+}
+.document-item-inner:hover{
+    background-color: #ebebea;
+}
+.selected-document{
+    background-color: #ebebea;
+}
+.document-item-inner > button{
+    height: 20px;
+    width: 21px;
+}
+.document-item-inner > button > svg{
+    width: 20px;
+    height: 20px;
+    fill:#6D6C68;
+    stroke: #6D6C68;
+}
+.document-item-inner > a {
+    white-space: nowrap; /* 텍스트 줄 바꿈 금지 */
+    overflow: hidden; /* 넘치는 부분 숨김 */
+    text-overflow: ellipsis; 
+}
+.no-sub-document{
+    height: 24px;
+    margin:4px;
+}
+.add-root-doc-btn{
+    height: 24px;
+    width: 100%;
+    padding-left: 18px;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+.add-root-doc-btn>svg{
+    margin-right: 8px;
+    width: 10px;
+    fill:#6D6C68;
+    stroke: #6D6C68;
+}
+.display-none{
+    display: none;
+}
+.rotate-default{
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+.rotate-90edge{
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
+}
+.main-page{
+    padding-left: 250px;
+    flex:9;
+    height: 200vh;
+}
+.main-page > .title{
+    padding: 10px;
+}
+.editor{
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #37352f;
+}
+.editor>input{
+    width:750px; 
+    height:100px; 
+    font-size:36px; 
+    font-weight:600;
+    color: inherit;
+    border: none;
+}
+.editor>input:focus{
+    outline: none;
+}
+.editor>input::placeholder{
+    color:#e1e1e0;
+}
+.content-wrapper{
+    display: flex;
+    flex-direction: column;
+     width:750px; 
+     height:500px;
+     font-size: 16px;
+    color:inherit;
+
+}
+.content{
+    word-break: break-all;
+    white-space: break-spaces;
+    margin: 3px 0 3px 0;
+}
+.content:focus{
+    outline:none;
+}
+.content::before{
+    color:#d7d7d7;
+}
+.content-editable:empty::before {
+    content: attr(placeholder);
+    cursor: text;
+ }
+.placeholder-h::before{
+    color:#e1e1e0;
+}
+.resize-cursor{
+    cursor: col-resize;
+}
