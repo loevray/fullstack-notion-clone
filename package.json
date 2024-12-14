@@ -4,9 +4,15 @@
   "description": "empty",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run start:api-server\" \"npm run start:web-server\"",
+    "start:api-server": "npm run start --prefix api-server",
+    "start:web-server": "npm run start --prefix web-server"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  }
 }
