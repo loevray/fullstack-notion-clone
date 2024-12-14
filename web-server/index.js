@@ -4,7 +4,10 @@ const path = require("path");
 const PORT = 3000;
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(__dirname, req.url === "/" ? "index.html" : req.url);
+  let filePath = path.join(
+    __dirname,
+    req.url === "/" ? "/public/index.html" : req.url
+  );
   const extname = path.extname(filePath);
 
   // MIME 타입 설정
