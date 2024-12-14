@@ -8,7 +8,7 @@
 
 ### DocumentsType 구조
 
-```json
+```ts
 {
   "id": number,
   "title": string,
@@ -18,7 +18,7 @@
 
 ### DocumentType 구조
 
-```json
+```ts
 {
   "id": number,
   "title": string,
@@ -73,7 +73,7 @@
 - **엔드포인트**: `/documents/${documentId}`
 - **메서드**: GET
 - **응답**:
-  ```json
+  ```ts
   {
     "id": number,
     "title": string,
@@ -122,7 +122,7 @@
 
 일관성을 유지하기 위해 모든 에러 응답은 아래 형식을 따릅니다:
 
-```json
+```ts
 {
   "status": <HTTP 상태 코드>,
   "error": "<에러 요약>",
