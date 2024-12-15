@@ -14,4 +14,11 @@ const connectDB = async () => {
   return db;
 };
 
-module.exports = connectDB;
+module.exports = {
+  connectDB,
+  _internal: {
+    setDb: (newDb) => {
+      db = newDb;
+    },
+  },
+};
