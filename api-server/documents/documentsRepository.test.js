@@ -9,6 +9,10 @@ const {
 } = require("./documentsRepository.js");
 const { _internal } = require("../models/db");
 
+const mockDate = new Date(2024, 11, 15, 19, 52, 0);
+
+jest.useFakeTimers({ doNotFake: ["nextTick"] }).setSystemTime(mockDate);
+
 describe("insert", () => {
   let client;
   let connection;
@@ -55,7 +59,6 @@ describe("insert", () => {
     expect(insertedUser).toEqual({
       ...mockDocument,
       id: 1,
-      _id: 1,
       path: null,
     });
   });
@@ -201,5 +204,70 @@ describe("insert", () => {
     const documentList = await getDocuments();
 
     expect(documentList).toEqual(mockDocumentList);
+  });
+
+  it("should updated document", async () => {
+    const mockDocument = {
+      id: 4,
+      title: "제목4",
+      content: "내용444444ㅋㅋㅋ",
+      path: ",1,3,",
+      createdAt: "2024-12-15-19:52:00",
+      updatedAt: "2024-12-15-19:52:00",
+    };
+
+    await createDocument({
+      document: {
+        title: "제목1",
+        content: "내용1",
+        createdAt: "2024-12-15-19:52:00",
+        updatedAt: "2024-12-15-19:52:00",
+      },
+    });
+
+    await createDocument({
+      parent: 1,
+      document: {
+        title: "제목2",
+        content: "내용2",
+        createdAt: "2024-12-15-19:52:00",
+        updatedAt: "2024-12-15-19:52:00",
+      },
+    });
+
+    await createDocument({
+      parent: 1,
+      document: {
+        title: "제목3",
+        content: "내용3",
+        createdAt: "2024-12-15-19:52:00",
+        updatedAt: "2024-12-15-19:52:00",
+      },
+    });
+
+    await createDocument({
+      parent: 3,
+      document: {
+        title: "제목4",
+        content: "내용4",
+        createdAt: "2024-12-15-19:52:00",
+        updatedAt: "2024-12-15-19:52:00",
+      },
+    });
+
+    await updateDocument({
+      id: 4,
+      newDocument: {
+        title: "제목4",
+        content: "내용444444ㅋㅋㅋ",
+        path: ",1,3,",
+        createdAt: "2024-12-15-19:52:00",
+        updatedAt: "2024-12-15-19:52:00",
+      },
+    });
+
+    const updatedDocument = await getDocumentById(4);
+
+    expect(updatedDocument).toEqual(mockDocument);
   });
 });

@@ -60,8 +60,31 @@ async function getDocuments() {
 
 async function getDocumentById(id) {
   const db = await connectDB();
-  return await db.collection(COLLECTION_NAME).findOne({ _id: id });
+  return await db.collection(COLLECTION_NAME).findOne(
+    { _id: id },
+    {
+      projection: { _id: 0 },
+    }
+  );
 }
+
+const getToday = () => {
+  const now = new Date();
+
+  return (formattedDate = now
+    .toLocaleString("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    })
+    .replaceAll(" ", "")
+    .replaceAll(".", "-"));
+};
 
 async function createDocument({ parent = null, document }) {
   const db = await connectDB();
@@ -83,11 +106,15 @@ async function createDocument({ parent = null, document }) {
     path = parentDoc.path ? `${parentDoc.path}${parent},` : `,${parent},`;
   }
 
+  const today = getToday();
+
   const newDocument = {
     _id: nextId,
     id: nextId,
     ...document,
     path,
+    createdAt: today,
+    updatedAt: today,
   };
 
   return await db.collection(COLLECTION_NAME).insertOne(newDocument);
@@ -96,34 +123,35 @@ async function createDocument({ parent = null, document }) {
 async function updateDocument({ id, newDocument }) {
   const db = await connectDB();
 
+  const updatedDocument = { ...newDocument, updatedAt: getToday() };
   return await db
     .collection(COLLECTION_NAME)
-    .updateOne({ _id: id }, { $set: newDocument });
-}
-
-async function updateChildPaths(childDoc) {
-  let newPath = childDoc.path.replace(`,${id},`, ",");
-  if (newPath === ",") newPath = null;
-
-  // path 업데이트
-  await documentsColl.updateOne(
-    { _id: childDoc._id },
-    { $set: { path: newPath } }
-  );
-
-  // 자식 문서가 있으면 재귀적으로 처리
-  const grandChildrenDocuments = await documentsColl
-    .find({
-      path: { $regex: `,${childDoc._id},` }, // 자식 문서들 찾기
-    })
-    .toArray();
-
-  for (const grandChild of grandChildrenDocuments) {
-    await updateChildPaths(grandChild); // 재귀 호출
-  }
+    .updateOne({ _id: id }, { $set: updatedDocument });
 }
 
 async function deleteDocument(id) {
+  async function updateChildPaths(childDoc) {
+    let newPath = childDoc.path.replace(`,${id},`, ",");
+    if (newPath === ",") newPath = null;
+
+    // path 업데이트
+    await documentsColl.updateOne(
+      { _id: childDoc._id },
+      { $set: { path: newPath } }
+    );
+
+    // 자식 문서가 있으면 재귀적으로 처리
+    const grandChildrenDocuments = await documentsColl
+      .find({
+        path: { $regex: `,${childDoc._id},` }, // 자식 문서들 찾기
+      })
+      .toArray();
+
+    for (const grandChild of grandChildrenDocuments) {
+      await updateChildPaths(grandChild); // 재귀 호출
+    }
+  }
+
   const db = await connectDB();
   const documentsColl = await db.collection(COLLECTION_NAME);
 
