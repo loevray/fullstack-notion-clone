@@ -8,12 +8,13 @@ const {
   deleteDocument,
 } = require("./documentsRepository.js");
 const { _internal } = require("../models/db");
+const { getToday } = require("./utils/getToday.js");
 
 const mockDate = new Date(2024, 11, 15, 19, 52, 0);
 
 jest.useFakeTimers({ doNotFake: ["nextTick"] }).setSystemTime(mockDate);
 
-describe("insert", () => {
+describe("Documents Repository Tests", () => {
   let client;
   let connection;
   let db;
@@ -44,19 +45,60 @@ describe("insert", () => {
     await connection.close();
   });
 
-  it("should insert a doc into collection", async () => {
+  // 공통 데이터 생성 함수
+  const setupTestData = async () => {
+    await createDocument({
+      document: {
+        title: "제목1",
+        content: "내용1",
+        createdAt: getToday(),
+        updatedAt: getToday(),
+      },
+    });
+
+    await createDocument({
+      parent: 1,
+      document: {
+        title: "제목2",
+        content: "내용2",
+        createdAt: getToday(),
+        updatedAt: getToday(),
+      },
+    });
+
+    await createDocument({
+      parent: 1,
+      document: {
+        title: "제목3",
+        content: "내용3",
+        createdAt: getToday(),
+        updatedAt: getToday(),
+      },
+    });
+
+    await createDocument({
+      parent: 3,
+      document: {
+        title: "제목4",
+        content: "내용4",
+        createdAt: getToday(),
+        updatedAt: getToday(),
+      },
+    });
+  };
+
+  it("should insert a document into the collection", async () => {
     const mockDocument = {
       title: "제목 인데용?",
       content: "내용 인데용?",
-      createdAt: "2024-12-15-19:52:00",
-      updatedAt: "2024-12-15-19:52:00",
+      createdAt: getToday(),
+      updatedAt: getToday(),
     };
 
     await createDocument({ document: mockDocument });
+    const insertedDocument = await getDocumentById(1);
 
-    const insertedUser = await getDocumentById(1);
-
-    expect(insertedUser).toEqual({
+    expect(insertedDocument).toEqual({
       ...mockDocument,
       id: 1,
       path: null,
@@ -64,7 +106,9 @@ describe("insert", () => {
   });
 
   it("should get document list", async () => {
-    const mockDocumentList = [
+    await setupTestData();
+
+    const expectedDocumentList = [
       {
         id: 1,
         title: "제목1",
@@ -93,52 +137,16 @@ describe("insert", () => {
       },
     ];
 
-    await createDocument({
-      document: {
-        title: "제목1",
-        content: "내용1",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목2",
-        content: "내용2",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목3",
-        content: "내용3",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 3,
-      document: {
-        title: "제목4",
-        content: "내용4",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
     const documentList = await getDocuments();
-
-    expect(documentList).toEqual(mockDocumentList);
+    expect(documentList).toEqual(expectedDocumentList);
   });
 
-  it("should child document up to upper hierarchy", async () => {
-    const mockDocumentList = [
+  it("should move child documents to upper hierarchy when parent is deleted", async () => {
+    await setupTestData();
+
+    await deleteDocument(1);
+
+    const expectedDocumentList = [
       {
         id: 2,
         title: "제목2",
@@ -160,114 +168,27 @@ describe("insert", () => {
       },
     ];
 
-    await createDocument({
-      document: {
-        title: "제목1",
-        content: "내용1",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목2",
-        content: "내용2",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목3",
-        content: "내용3",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 3,
-      document: {
-        title: "제목4",
-        content: "내용4",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await deleteDocument(1);
-
     const documentList = await getDocuments();
-
-    expect(documentList).toEqual(mockDocumentList);
+    expect(documentList).toEqual(expectedDocumentList);
   });
 
-  it("should updated document", async () => {
-    const mockDocument = {
-      id: 4,
+  it("should update a document", async () => {
+    await setupTestData();
+
+    const updatedContent = {
       title: "제목4",
       content: "내용444444ㅋㅋㅋ",
       path: ",1,3,",
-      createdAt: "2024-12-15-19:52:00",
-      updatedAt: "2024-12-15-19:52:00",
+      createdAt: getToday(),
+      updatedAt: getToday(),
     };
-
-    await createDocument({
-      document: {
-        title: "제목1",
-        content: "내용1",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목2",
-        content: "내용2",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 1,
-      document: {
-        title: "제목3",
-        content: "내용3",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
-
-    await createDocument({
-      parent: 3,
-      document: {
-        title: "제목4",
-        content: "내용4",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
-    });
 
     await updateDocument({
       id: 4,
-      newDocument: {
-        title: "제목4",
-        content: "내용444444ㅋㅋㅋ",
-        path: ",1,3,",
-        createdAt: "2024-12-15-19:52:00",
-        updatedAt: "2024-12-15-19:52:00",
-      },
+      newDocument: updatedContent,
     });
 
     const updatedDocument = await getDocumentById(4);
-
-    expect(updatedDocument).toEqual(mockDocument);
+    expect(updatedDocument).toEqual({ id: 4, ...updatedContent });
   });
 });
