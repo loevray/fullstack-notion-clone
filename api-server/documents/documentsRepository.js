@@ -1,4 +1,5 @@
 const { connectDB, client, getClient } = require("../models/db");
+const { getToday } = require("./utils/getToday");
 
 const COLLECTION_NAME = "documents";
 
@@ -67,24 +68,6 @@ async function getDocumentById(id) {
     }
   );
 }
-
-const getToday = () => {
-  const now = new Date();
-
-  return (formattedDate = now
-    .toLocaleString("ko-KR", {
-      timeZone: "Asia/Seoul",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    })
-    .replaceAll(" ", "")
-    .replaceAll(".", "-"));
-};
 
 async function createDocument({ parent = null, document }) {
   const db = await connectDB();
