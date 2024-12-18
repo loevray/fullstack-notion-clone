@@ -24,7 +24,7 @@ async function getNextSequenceValue(collectionName) {
 async function getDocuments() {
   const db = await connectDB();
   const documents = await db.collection(COLLECTION_NAME).find().toArray();
-  console.log(JSON.stringify(documents, null, 2));
+
   return buildTreeFromMaterializedPath(documents);
 }
 
