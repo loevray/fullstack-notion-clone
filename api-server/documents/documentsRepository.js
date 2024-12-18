@@ -39,7 +39,7 @@ async function getDocumentById(id) {
   );
 }
 
-async function createDocument({ parentId = null, document }) {
+async function createDocument({ parentId = null, title }) {
   const db = await connectDB();
 
   const nextId = await getNextSequenceValue(COLLECTION_NAME);
@@ -49,7 +49,8 @@ async function createDocument({ parentId = null, document }) {
   const newDocument = {
     _id: nextId,
     id: nextId,
-    ...document,
+    ...title,
+    content: "",
     path,
     createdAt: today,
     updatedAt: today,

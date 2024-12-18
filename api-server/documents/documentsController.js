@@ -26,8 +26,8 @@ async function getDocumentListController(req, res) {
   return res.end(JSON.stringify(documentList));
 }
 async function createDocumentController(req, res) {
-  const { parentId, document } = req.body;
-  const newDocument = await createDocument({ parentId, document });
+  const { parent: parentId, title } = req.body;
+  const newDocument = await createDocument({ parentId, title });
   res.writeHead(201, {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
