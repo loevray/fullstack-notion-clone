@@ -6,15 +6,15 @@ const {
   createDocument,
   updateDocument,
   deleteDocument,
-} = require("./documentsRepository.js");
-const { _internal } = require("../models/db");
+} = require("./documentsService.js");
+const { _internal } = require("../models/db.js");
 const getToday = require("./utils/getToday.js");
 
 const mockDate = new Date(2024, 11, 15, 19, 52, 0);
 
 jest.useFakeTimers({ doNotFake: ["nextTick"] }).setSystemTime(mockDate);
 
-describe("Documents Repository Tests", () => {
+describe("Document Service tests", () => {
   let client;
   let connection;
   let db;

@@ -2,7 +2,7 @@ const {
   createDocument,
   getDocumentById,
   getDocuments,
-} = require("./documentsRepository");
+} = require("./documentsService");
 
 async function getDocumentController(req, res) {
   const { documentId } = req.body;
