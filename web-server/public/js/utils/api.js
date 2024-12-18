@@ -1,11 +1,10 @@
-import { API_END_POINT, X_USERNAME } from "../env.js";
+import { API_END_POINT } from "../env.js";
 export const request = async (url, options = {}) => {
   try {
     const res = await fetch(
       `${API_END_POINT}${url.startsWith("/") ? url : `/${url}`}`,
       {
         headers: {
-          "x-username": X_USERNAME,
           "Content-Type": "application/json",
         },
         ...options,

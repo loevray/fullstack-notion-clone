@@ -38,6 +38,7 @@ export default class Nav extends Component {
     push(`/documents/${response.id}`);
     return response;
   }
+
   async removeDocument(id) {
     await request(`/documents/${id}`, {
       method: "DELETE",
@@ -45,6 +46,7 @@ export default class Nav extends Component {
     this.getDocuments();
     push("/");
   }
+
   render() {
     const data = store.useSelector((state) => state.documentsReducer.documents);
     const selectedDocument = store.useSelector(
