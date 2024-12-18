@@ -8,7 +8,7 @@ const {
   deleteDocument,
 } = require("./documentsRepository.js");
 const { _internal } = require("../models/db");
-const { getToday } = require("./utils/getToday.js");
+const getToday = require("./utils/getToday.js");
 
 const mockDate = new Date(2024, 11, 15, 19, 52, 0);
 
@@ -57,7 +57,7 @@ describe("Documents Repository Tests", () => {
     });
 
     await createDocument({
-      parent: 1,
+      parentId: 1,
       document: {
         title: "제목2",
         content: "내용2",
@@ -67,7 +67,7 @@ describe("Documents Repository Tests", () => {
     });
 
     await createDocument({
-      parent: 1,
+      parentId: 1,
       document: {
         title: "제목3",
         content: "내용3",
@@ -77,7 +77,7 @@ describe("Documents Repository Tests", () => {
     });
 
     await createDocument({
-      parent: 3,
+      parentId: 3,
       document: {
         title: "제목4",
         content: "내용4",
@@ -89,6 +89,7 @@ describe("Documents Repository Tests", () => {
 
   it("should insert a document into the collection", async () => {
     const mockDocument = {
+      id: 1,
       title: "제목 인데용?",
       content: "내용 인데용?",
       createdAt: getToday(),
@@ -96,11 +97,11 @@ describe("Documents Repository Tests", () => {
     };
 
     await createDocument({ document: mockDocument });
+
     const insertedDocument = await getDocumentById(1);
 
-    expect(insertedDocument).toEqual({
+    expect({ ...insertedDocument }).toEqual({
       ...mockDocument,
-      id: 1,
       path: null,
     });
   });
@@ -141,8 +142,10 @@ describe("Documents Repository Tests", () => {
     expect(documentList).toEqual(expectedDocumentList);
   });
 
-  it("should move child documents to upper hierarchy when parent is deleted", async () => {
+  it("should move child documents to upper hierarchy when parentId is deleted", async () => {
     await setupTestData();
+
+    const origin = await getDocuments();
 
     await deleteDocument(1);
 
@@ -169,13 +172,14 @@ describe("Documents Repository Tests", () => {
     ];
 
     const documentList = await getDocuments();
+
     expect(documentList).toEqual(expectedDocumentList);
   });
 
   it("should update a document", async () => {
     await setupTestData();
 
-    const updatedContent = {
+    const newDocument = {
       title: "제목4",
       content: "내용444444ㅋㅋㅋ",
       path: ",1,3,",
@@ -184,11 +188,12 @@ describe("Documents Repository Tests", () => {
     };
 
     await updateDocument({
-      id: 4,
-      newDocument: updatedContent,
+      documentId: 4,
+      newDocument,
     });
 
     const updatedDocument = await getDocumentById(4);
-    expect(updatedDocument).toEqual({ id: 4, ...updatedContent });
+
+    expect(updatedDocument).toEqual({ id: 4, ...newDocument });
   });
 });
