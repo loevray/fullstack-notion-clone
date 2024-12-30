@@ -37,7 +37,7 @@ const router = () => {
         return;
       }
 
-      if (method === "POST") {
+      if (method === "POST" || method === "PUT") {
         let body = [];
 
         req.on("data", (chunk) => {

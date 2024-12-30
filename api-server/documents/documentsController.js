@@ -25,9 +25,8 @@ async function getDocumentListController(req, res) {
 }
 
 async function createDocumentController(req, res) {
-  console.log(req.body);
-  const { parent: parentId, title } = req.body;
-  const newDocument = await createDocument({ parentId, title });
+  const { parent, title } = req.body;
+  const newDocument = await createDocument({ parentId: parent, title });
   res.writeHead(201, CORS_HEADER);
   return res.end(JSON.stringify(newDocument));
 }

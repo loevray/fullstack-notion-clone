@@ -64,6 +64,7 @@ export const removeDocumentASync = (documentId) => async (dispatch) => {
 
 const fetchDocuments = async (dispatch) => {
   const documents = await request("/documents");
+  console.log(documents);
   // [{id:number, title:string, documents:array, createAt:string, updatedAt:string}]
   dispatch({
     type: FETCH_DOCUMENTS,

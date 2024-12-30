@@ -49,7 +49,7 @@ async function createDocument({ parentId = null, title }) {
   const newDocument = {
     _id: nextId,
     id: nextId,
-    ...title,
+    title,
     content: "",
     path,
     createdAt: today,
