@@ -107,7 +107,8 @@ async function findParentDocument(parentId) {
   const db = await connectDB();
   const parentDoc = await db
     .collection(COLLECTION_NAME)
-    .findOne({ _id: parentId });
+    .findOne({ _id: +parentId });
+
   if (!parentDoc) throw new Error("Parent document not found.");
 
   return parentDoc;
