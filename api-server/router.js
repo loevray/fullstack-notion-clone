@@ -6,22 +6,51 @@ const router = () => {
     DELETE: {},
     OPTIONS: {},
   };
+  const middlewares = [];
+
+  const executeMiddlewares = (middlewares, req, res, done) => {
+    let index = 0;
+
+    const next = (err) => {
+      if (err) {
+        return done(err);
+      }
+
+      if (index >= middlewares.length) {
+        return done();
+      }
+
+      const middleware = middlewares[index++];
+      middleware(req, res, next);
+    };
+
+    next();
+  };
 
   return {
+    use: (middleware) => {
+      middlewares.push(middleware);
+      return this;
+    },
     post: (path, api) => {
       routes.POST[path] = api;
+      return this;
     },
     get: (path, api) => {
       routes.GET[path] = api;
+      return this;
     },
     put: (path, api) => {
       routes.PUT[path] = api;
+      return this;
     },
     delete: (path, api) => {
       routes.DELETE[path] = api;
+      return this;
     },
     options: (path, api) => {
       routes.OPTIONS[path] = api;
+      return this;
     },
     handleRequest: async (req, res) => {
       const { method, url } = req;
@@ -58,7 +87,14 @@ const router = () => {
       }
 
       if (routes[method] && routes[method][url]) {
-        routes[method][url](req, res);
+        executeMiddlewares(middlewares, req, res, (err) => {
+          if (err) {
+            res.writeHead(500, { "Content-Type": "text/plain" });
+            res.end("Internal Server Error");
+            return;
+          }
+          routes[method][url](req, res);
+        });
       } else {
         res.writeHead(404, { "Content-Type": "text/plain" });
         res.end("Not Found");
@@ -66,5 +102,10 @@ const router = () => {
     },
   };
 };
+
+/* 
+
+  router.use(...)사용시 미들웨어 추가
+*/
 
 module.exports = router;

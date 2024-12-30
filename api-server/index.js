@@ -12,6 +12,27 @@ const documentsRouter = router();
 documentsRouter.get("/documents", getDocumentListController);
 documentsRouter.post("/documents", createDocumentController);
 
+const logMiddleware = (req, res, next) => {
+  console.log(`메서드:${req.method}는 링크:${req.url} 접속시 실행됨`);
+  next();
+};
+
+const CORS_HEADER = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+const setHeader = (req, res, next) => {
+  for (const key in CORS_HEADER) {
+    res.setHeader(key, CORS_HEADER[key]);
+  }
+  next();
+};
+
+documentsRouter.use(logMiddleware);
+documentsRouter.use(setHeader);
+
 const server = createServer((req, res) => {
   documentsRouter.handleRequest(req, res);
 });
