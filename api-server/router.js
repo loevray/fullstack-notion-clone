@@ -1,5 +1,3 @@
-const http = require("http");
-
 const router = () => {
   const routes = {
     GET: {},
@@ -25,8 +23,10 @@ const router = () => {
     options: (path, api) => {
       routes.OPTIONS[path] = api;
     },
-    handleRequest: (req, res) => {
+    handleRequest: async (req, res) => {
       const { method, url } = req;
+
+      // CORS 처리
       if (method === "OPTIONS") {
         res.writeHead(204, {
           "Access-Control-Allow-Origin": "*",
@@ -37,10 +37,28 @@ const router = () => {
         return;
       }
 
-      const route = routes[method][url];
+      if (method === "POST") {
+        let body = [];
 
-      if (route) {
-        route(req, res); // 경로에 해당하는 핸들러 실행
+        req.on("data", (chunk) => {
+          body.push(chunk);
+        });
+
+        await new Promise((resolve, reject) => {
+          req.on("end", () => {
+            try {
+              const buffer = Buffer.concat(body);
+              req.body = JSON.parse(buffer.toString());
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          });
+        });
+      }
+
+      if (routes[method] && routes[method][url]) {
+        routes[method][url](req, res);
       } else {
         res.writeHead(404, { "Content-Type": "text/plain" });
         res.end("Not Found");
