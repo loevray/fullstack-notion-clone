@@ -31,12 +31,15 @@ async function getDocuments() {
 async function getDocumentById(id) {
   const db = await connectDB();
 
-  return await db.collection(COLLECTION_NAME).findOne(
-    { _id: id },
+  const document = await db.collection(COLLECTION_NAME).findOne(
+    { _id: +id },
     {
       projection: { _id: 0 },
     }
   );
+
+  console.log(document);
+  return document;
 }
 
 async function createDocument({ parentId = null, title }) {

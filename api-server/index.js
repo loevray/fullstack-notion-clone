@@ -3,6 +3,7 @@ const router = require("./router");
 const {
   getDocumentListController,
   createDocumentController,
+  getDocumentController,
 } = require("./documents/documentsController");
 
 const PORT = 4000;
@@ -10,6 +11,7 @@ const PORT = 4000;
 const documentsRouter = router();
 
 documentsRouter.get("/documents", getDocumentListController);
+documentsRouter.get("/documents/:id", getDocumentController);
 documentsRouter.post("/documents", createDocumentController);
 
 const logMiddleware = (req, res, next) => {
@@ -18,6 +20,7 @@ const logMiddleware = (req, res, next) => {
 };
 
 const CORS_HEADER = {
+  "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
