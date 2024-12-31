@@ -8,7 +8,6 @@ const {
 const getToday = require("./utils/getToday");
 
 async function getDocumentController(req, res) {
-  //req.url에서 documentId를 추출;
   const documentId = req.params.id;
   const document = await getDocumentById(documentId);
   res.writeHead(200);
