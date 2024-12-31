@@ -31,22 +31,19 @@ async function getDocuments() {
 async function getDocumentById(id) {
   const db = await connectDB();
 
-  const document = await db.collection(COLLECTION_NAME).findOne(
+  return await db.collection(COLLECTION_NAME).findOne(
     { _id: +id },
     {
       projection: { _id: 0 },
     }
   );
-
-  console.log(document);
-  return document;
 }
 
 async function createDocument({ parentId = null, title }) {
   const db = await connectDB();
 
   const nextId = await getNextSequenceValue(COLLECTION_NAME);
-  const path = await generateDocumentPath({ parentId });
+  const materializedPath = await generateDocumentPath({ parentId });
   const today = getToday();
 
   const newDocument = {
@@ -54,20 +51,29 @@ async function createDocument({ parentId = null, title }) {
     id: nextId,
     title,
     content: "",
-    path,
+    materializedPath,
     createdAt: today,
     updatedAt: today,
   };
 
-  return await db.collection(COLLECTION_NAME).insertOne(newDocument);
+  const result = await db.collection(COLLECTION_NAME).insertOne(newDocument);
+
+  return await getDocumentById(result.insertedId);
 }
 
 async function updateDocument({ documentId, newDocument }) {
   const db = await connectDB();
 
-  return await db
-    .collection(COLLECTION_NAME)
-    .updateOne({ _id: documentId }, { $set: newDocument });
+  return await db.collection(COLLECTION_NAME).findOneAndUpdate(
+    { _id: +documentId },
+    {
+      $set: {
+        ...newDocument,
+        updatedAt: getToday(),
+      },
+    },
+    { returnNewDocument: true }
+  );
 }
 
 async function getChildDocuments(parentId) {
@@ -76,7 +82,7 @@ async function getChildDocuments(parentId) {
   return await db
     .collection(COLLECTION_NAME)
     .find({
-      path: { $regex: `,${parentId},` },
+      materializedPath: { $regex: `,${parentId},` },
     })
     .toArray();
 }
@@ -85,13 +91,13 @@ async function updateDescendantsPath(childDoc, parentId) {
   // 새로운 경로 생성
   const newPath = await generateDocumentPath({
     parentId,
-    currentPath: childDoc.path,
+    currentPath: childDoc.materializedPath,
   });
 
   // 문서 업데이트
   await updateDocument({
     documentId: childDoc._id,
-    newDocument: { path: newPath },
+    newDocument: { materializedPath: newPath },
   });
 
   // 자식 문서 재귀 처리
@@ -122,7 +128,9 @@ async function generateDocumentPath({ parentId, currentPath }) {
 
   if (!currentPath) {
     const parentDoc = await findParentDocument(parentId);
-    return parentDoc.path ? `${parentDoc.path}${parentId},` : `,${parentId},`;
+    return parentDoc.materializedPath
+      ? `${parentDoc.materializedPath}${parentId},`
+      : `,${parentId},`;
   }
 
   let newPath = currentPath.replace(`,${parentId},`, ",");
@@ -131,7 +139,7 @@ async function generateDocumentPath({ parentId, currentPath }) {
 
 async function deleteDocument(id) {
   const db = await connectDB();
-  const documentToDelete = getDocumentById(id);
+  const documentToDelete = await getDocumentById(id);
 
   if (!documentToDelete) {
     throw new Error("Document not found");
@@ -146,7 +154,7 @@ async function deleteDocument(id) {
   }
 
   // 문서 삭제
-  return await db.collection(COLLECTION_NAME).deleteOne({ _id: id });
+  return await db.collection(COLLECTION_NAME).deleteOne({ _id: +id });
 }
 
 module.exports = {

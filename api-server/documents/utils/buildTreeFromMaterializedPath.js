@@ -10,14 +10,14 @@ module.exports = (documents) => {
 
   // 2. 부모-자식 관계 설정
   for (const doc of documents) {
-    const { _id, path } = doc;
+    const { _id, materializedPath } = doc;
 
-    if (!path) {
+    if (!materializedPath) {
       // path가 null이면 루트 문서
       rootNodes.push(idToNodeMap[_id]);
     } else {
       // 부모 ID 추출
-      const parentIds = path.split(",").filter(Boolean);
+      const parentIds = materializedPath.split(",").filter(Boolean);
       const parentId = parentIds[parentIds.length - 1];
       if (idToNodeMap[parentId]) {
         idToNodeMap[parentId].documents.push(idToNodeMap[_id]);
