@@ -114,17 +114,6 @@ export const fetchCurrentDocumentAsync =
     }
   };
 
-/* {
-    "id": 122298,
-    "title": "제목 없음",
-    "content": null,
-    "parent": {
-    },
-    "username": "5AKimyoungheon",
-    "created_at": "2023-11-19T14:36:32.926Z",
-    "updated_at": "2023-11-19T14:36:32.930Z"
-  } */
-
 export const updateDocumentAsync = (documentData) => async (dispatch) => {
   try {
     const { id, title, content } = documentData;
@@ -132,10 +121,12 @@ export const updateDocumentAsync = (documentData) => async (dispatch) => {
       title: title || "제목 없음",
       content,
     };
+
     const updateDocument = await request(`/documents/${id}`, {
       method: "PUT",
       body: JSON.stringify(requestBody),
     });
+
     dispatch({
       type: UPDATE_DOCUMENT,
       payload: {
@@ -143,6 +134,7 @@ export const updateDocumentAsync = (documentData) => async (dispatch) => {
         content: updateDocument.content,
       },
     });
+
     fetchDocuments(dispatch);
   } catch (e) {
     console.log(e);

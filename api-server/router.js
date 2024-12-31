@@ -32,14 +32,12 @@ const router = () => {
   const parsePath = (path) => {
     const parts = path.split("/");
 
-    // :id와 같은 동적 경로를 정규식으로 바꿔줍니다.
-    return new RegExp(
-      "^" +
-        parts
-          .map((part) => (part.startsWith(":") ? "([^/]+)" : part))
-          .join("/") +
-        "$"
-    );
+    // :id와 같은 동적 경로가 있으면 [^/]+을 더한 정규식으로 변경
+    const regexParts = parts
+      .map((part) => (part.startsWith(":") ? "([^/]+)" : part))
+      .join("/");
+
+    return new RegExp(`^${regexParts}$`);
   };
 
   // 라우터에 경로를 등록하는 함수
