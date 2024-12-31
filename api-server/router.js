@@ -68,11 +68,10 @@ const router = () => {
       routes.OPTIONS[path] = { api, regex: parsePath(path) };
       return this;
     },
-    // 요청을 처리하는 함수
-    handleRequest: async (req, res) => {
+    handleRequest: (req, res) => {
       const { method, url } = req;
 
-      // CORS 처리
+      //CORS Preflight request 처리
       if (method === "OPTIONS") {
         res.writeHead(204, {
           "Access-Control-Allow-Origin": "*",
@@ -83,28 +82,6 @@ const router = () => {
         return;
       }
 
-      // POST, PUT 요청의 body 처리
-      if (method === "POST" || method === "PUT") {
-        let body = [];
-
-        req.on("data", (chunk) => {
-          body.push(chunk);
-        });
-
-        await new Promise((resolve, reject) => {
-          req.on("end", () => {
-            try {
-              const buffer = Buffer.concat(body);
-              req.body = JSON.parse(buffer.toString());
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          });
-        });
-      }
-
-      // 요청 URL을 처리하는 로직
       let matchedRoute = null;
 
       if (routes[method]) {

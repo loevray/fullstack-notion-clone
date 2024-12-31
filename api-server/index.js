@@ -5,6 +5,8 @@ const {
   createDocumentController,
   getDocumentController,
 } = require("./documents/documentsController");
+const cors = require("./middlewares/cors");
+const bodyParser = require("./middlewares/bodyParser");
 
 const PORT = 4000;
 
@@ -19,22 +21,9 @@ const logMiddleware = (req, res, next) => {
   next();
 };
 
-const CORS_HEADER = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
-const setHeader = (req, res, next) => {
-  for (const key in CORS_HEADER) {
-    res.setHeader(key, CORS_HEADER[key]);
-  }
-  next();
-};
-
 documentsRouter.use(logMiddleware);
-documentsRouter.use(setHeader);
+documentsRouter.use(cors);
+documentsRouter.use(bodyParser);
 
 const server = createServer((req, res) => {
   documentsRouter.handleRequest(req, res);
