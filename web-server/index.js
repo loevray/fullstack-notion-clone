@@ -8,6 +8,7 @@ const server = http.createServer((req, res) => {
     __dirname,
     req.url === "/" ? "/public/index.html" : req.url
   );
+
   const extname = path.extname(filePath);
 
   // MIME 타입 설정
@@ -29,11 +30,22 @@ const server = http.createServer((req, res) => {
     }
 
     if (err.code === "ENOENT") {
-      // 파일을 찾을 수 없음
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("404 Not Found");
+      // html 요청이면 index.html 반환 (SPA 새로고침 대응)
+      fs.readFile(
+        path.join(__dirname, "/public/index.html"),
+        (error, indexData) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "text/plain" });
+            res.end("Internal Server Error");
+            return;
+          }
+          res.writeHead(200, { "Content-Type": "text/html" });
+          res.end(indexData);
+        }
+      );
       return;
     }
+
     // 기타 서버 오류
     res.writeHead(500, { "Content-Type": "text/plain" });
     res.end("Internal Server Error");
@@ -43,5 +55,3 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-//-------db------//
