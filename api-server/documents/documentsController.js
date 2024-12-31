@@ -2,11 +2,14 @@ const {
   createDocument,
   getDocumentById,
   getDocuments,
+  updateDocument,
+  deleteDocument,
 } = require("./documentsService");
+const getToday = require("./utils/getToday");
 
 async function getDocumentController(req, res) {
   //req.url에서 documentId를 추출;
-  const documentId = req.url.split("/")[2];
+  const documentId = req.params.id;
   const document = await getDocumentById(documentId);
   res.writeHead(200);
   return res.end(JSON.stringify(document));
@@ -26,11 +29,23 @@ async function createDocumentController(req, res) {
 }
 
 async function updateDocumentController(req, res) {
-  return;
+  const { title, content } = req.body;
+  const documentId = req.params.id;
+  const updatedDocument = await updateDocument({
+    documentId,
+    newDocument: { title, content },
+  });
+
+  console.log(updatedDocument);
+  res.writeHead(200);
+  return res.end(JSON.stringify(updatedDocument));
 }
 
 async function deleteDocumentController(req, res) {
-  return;
+  const documentId = req.params.id;
+  await deleteDocument(documentId);
+  res.writeHead(204);
+  return res.end(JSON.stringify(documentId));
 }
 
 module.exports = {

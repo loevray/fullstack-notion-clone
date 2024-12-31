@@ -4,6 +4,8 @@ const {
   getDocumentListController,
   createDocumentController,
   getDocumentController,
+  updateDocumentController,
+  deleteDocumentController,
 } = require("./documents/documentsController");
 const cors = require("./middlewares/cors");
 const bodyParser = require("./middlewares/bodyParser");
@@ -14,6 +16,8 @@ const documentsRouter = router();
 
 documentsRouter.get("/documents", getDocumentListController);
 documentsRouter.get("/documents/:id", getDocumentController);
+documentsRouter.put("/documents/:id", updateDocumentController);
+documentsRouter.delete("/documents/:id", deleteDocumentController);
 documentsRouter.post("/documents", createDocumentController);
 
 const logMiddleware = (req, res, next) => {
