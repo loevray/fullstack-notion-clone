@@ -7,21 +7,35 @@ const router = () => {
     OPTIONS: {},
   };
   const middlewares = [];
+  const errorMiddlewares = [];
+
+  const defaultErrorHandler = (err, req, res) => {
+    console.error(err);
+    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.end("Internal Server Error");
+  };
 
   // 미들웨어 실행 함수
-  const executeMiddlewares = (middlewares, req, res, done) => {
-    let index = 0;
+  const executeRouteHandlers = (middlewares, req, res, api) => {
+    let middlewareIndex = 0;
+    let errorMiddlewareIndex = 0;
 
     const next = (err) => {
       if (err) {
-        return done(err);
+        const errorMiddleware = errorMiddlewares[errorMiddlewareIndex++];
+
+        if (!errorMiddleware) {
+          return defaultErrorHandler(err, req, res);
+        }
+
+        return errorMiddleware(err, req, res, next);
       }
 
-      if (index >= middlewares.length) {
-        return done();
+      if (middlewareIndex >= middlewares.length) {
+        return api(req, res, next);
       }
 
-      const middleware = middlewares[index++];
+      const middleware = middlewares[middlewareIndex++];
       middleware(req, res, next);
     };
 
@@ -40,10 +54,25 @@ const router = () => {
     return new RegExp(`^${regexParts}$`);
   };
 
+  // 동적 경로에서 추출한 params를 반환하는 함수
+  const getParams = (route) => {
+    let params = {};
+    const paramNames = route.split("/").filter((part) => part.startsWith(":"));
+
+    paramNames.forEach((param, index) => {
+      params[param.substring(1)] = match[index + 1]; // :id 등
+    });
+  };
+
   // 라우터에 경로를 등록하는 함수
   return {
     use: (middleware) => {
-      middlewares.push(middleware);
+      if (middleware.length === 3) {
+        middlewares.push(middleware);
+      }
+      if (middleware.length === 4) {
+        errorMiddlewares.push(middleware);
+      }
       return this;
     },
     post: (path, api) => {
@@ -84,41 +113,28 @@ const router = () => {
 
       if (routes[method]) {
         // 경로에서 동적 부분을 정규식으로 매칭
-        matchedRoute = Object.entries(routes[method]).find(
-          ([route, { regex }]) => regex.test(url)
+        matchedRoute = Object.entries(routes[method]).find(([_, { regex }]) =>
+          regex.test(url)
         );
       }
 
-      if (matchedRoute) {
-        const [route, { api, regex }] = matchedRoute;
-        const match = regex.exec(url);
-        req.params = {};
-
-        // 정규식에서 추출된 값들을 req.params에 할당
-        if (match) {
-          const paramNames = route
-            .split("/")
-            .filter((part) => part.startsWith(":"));
-          paramNames.forEach((param, index) => {
-            req.params[param.substring(1)] = match[index + 1]; // :id 등
-          });
-        }
-
-        // 미들웨어 실행
-        executeMiddlewares(middlewares, req, res, (err) => {
-          if (err) {
-            res.writeHead(500, { "Content-Type": "text/plain" });
-            res.end("Internal Server Error");
-            return;
-          }
-
-          // API 실행
-          api(req, res);
-        });
-      } else {
+      if (!matchedRoute) {
         res.writeHead(404, { "Content-Type": "text/plain" });
-        res.end("Not Found");
+        return res.end("Not Found");
       }
+
+      const [route, { api, regex }] = matchedRoute;
+      const match = regex.exec(url);
+
+      req.params = {};
+
+      // 정규식에서 추출된 값들을 req.params에 할당
+      if (match) {
+        req.params = getParams(route);
+      }
+
+      // 미들웨어 실행
+      executeRouteHandlers(middlewares, req, res, api);
     },
   };
 };
