@@ -1,9 +1,8 @@
-class NotFoundError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.status = 404;
+const CustomError = require("./customError");
+
+class NotFoundError extends CustomError {
+  constructor({ message, status = 404 }) {
+    super({ message, status });
   }
 }
 

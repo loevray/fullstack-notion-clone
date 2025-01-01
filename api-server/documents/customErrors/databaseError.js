@@ -1,9 +1,8 @@
-class DatabaseError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.status = 500;
+const CustomError = require("./customError");
+
+class DatabaseError extends CustomError {
+  constructor({ message, status = 500 }) {
+    super({ message, status });
   }
 }
 

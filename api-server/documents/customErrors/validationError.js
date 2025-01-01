@@ -1,9 +1,8 @@
-class ValidationError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-    this.stack = new Error().stack;
-    this.status = 400;
+const CustomError = require("./customError");
+
+class ValidationError extends CustomError {
+  constructor({ message, status = 400 }) {
+    super({ message, status });
   }
 }
 
