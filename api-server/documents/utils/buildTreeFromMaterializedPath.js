@@ -1,4 +1,8 @@
 module.exports = (documents) => {
+  if (!documents || documents.length === 0) {
+    return [];
+  }
+
   const idToNodeMap = {}; // 문서를 ID 기반으로 빠르게 조회하기 위한 맵
   const rootNodes = []; // 최상위 문서를 저장
 
