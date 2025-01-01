@@ -14,11 +14,14 @@ async function getDocumentController(req, res) {
 
   try {
     result = await getDocumentById(documentId);
+    console.log(result);
   } catch (e) {
     const { status, message } = handleErrors(e);
     result = { message };
     httpStatus = status;
   }
+
+  console.log(JSON.stringify(result));
 
   res.writeHead(httpStatus);
   return res.end(JSON.stringify(result));

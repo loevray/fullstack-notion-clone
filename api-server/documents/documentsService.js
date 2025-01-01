@@ -53,6 +53,8 @@ async function getDocumentById(id) {
 
     if (!document)
       throw new NotFoundError(`${id}번째 문서를 찾을 수 없습니다!`);
+
+    return document;
   } catch (e) {
     throw new DatabaseError(`Failed to get document: ${e.message}`);
   }
