@@ -50,7 +50,7 @@ async function createDocumentController(req, res) {
   let result;
 
   try {
-    result = await createDocument({ parentId: parent, title });
+    result = await createDocument({ parentId: +parent });
   } catch (e) {
     const { status, message } = handleErrors(e);
     result = { message };

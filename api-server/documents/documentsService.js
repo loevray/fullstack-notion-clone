@@ -60,11 +60,7 @@ async function getDocumentById(id) {
   }
 }
 
-async function createDocument({ parentId = null, title }) {
-  if (title.length >= 20) {
-    throw new ValidationError("제목은 20자 이하여야 합니다.");
-  }
-
+async function createDocument({ parentId = null }) {
   const db = await connectDB();
   const nextId = await getNextSequenceValue(COLLECTION_NAME);
   const materializedPath = await generateDocumentPath({ parentId });
@@ -73,7 +69,7 @@ async function createDocument({ parentId = null, title }) {
   const newDocument = {
     _id: nextId,
     id: nextId,
-    title,
+    title: "제목없음",
     content: "",
     materializedPath,
     createdAt: today,
@@ -88,11 +84,16 @@ async function createDocument({ parentId = null, title }) {
     throw new DatabaseError(`Failed to create document: ${e.message}`);
   }
 
-  return getDocumentById(result.insertedId);
+  console.log(result);
+
+  return await getDocumentById(result.insertedId);
 }
 
 async function updateDocument({ documentId, newDocument }) {
   const db = await connectDB();
+  if (newDocument.ctitle.length >= 20) {
+    throw new ValidationError("제목은 20자 이하여야 합니다.");
+  }
 
   try {
     const result = await db.collection(COLLECTION_NAME).findOneAndUpdate(
@@ -154,8 +155,6 @@ async function updateDescendantsPath(childDoc, parentId) {
 }
 
 async function findParentDocument(parentId) {
-  //parentId !== null
-
   if (!parentId) return null;
 
   const db = await connectDB();
@@ -175,16 +174,16 @@ async function findParentDocument(parentId) {
 }
 
 async function generateDocumentPath({ parentId, currentPath }) {
+  //루트에 문서를 생성하는 경우
   if (!parentId) return null;
 
+  //자식으로 문서를 생성하는 경우
   if (!currentPath) {
     const parentDoc = await findParentDocument(parentId);
-    if (!parentDoc)
-      return parentDoc.materializedPath
-        ? `${parentDoc.materializedPath}${parentId},`
-        : `,${parentId},`;
+    return `${parentDoc.materializedPath}${parentId},`;
   }
 
+  //조상문서 삭제시 자식문서들의 경로를 업데이트하는 경우
   let newPath = currentPath.replace(`,${parentId},`, ",");
   return newPath === "," ? null : newPath;
 }
