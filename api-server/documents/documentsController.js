@@ -49,7 +49,7 @@ async function deleteDocumentController(req, res) {
   await deleteDocument(documentId);
 
   res.writeHead(204);
-  return res.end(JSON.stringify({ documentId }));
+  return res.end();
 }
 
 module.exports = {

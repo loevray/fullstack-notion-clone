@@ -43,20 +43,18 @@ export const removeDocumentASync = (documentId) => async (dispatch) => {
       return alert("삭제하려는 문서 아이디를 지정해주세요");
     }
 
-    const deletedDocument = await request(`/documents/${documentId}`, {
+    await request(`/documents/${documentId}`, {
       method: "DELETE",
     });
 
-    if (!deletedDocument) {
-      throw new Error("문서 삭제되지 않음!");
-    }
-
     dispatch({
       type: REMOVE_DOCUMENT,
-      payload: deletedDocument.id,
+      payload: documentId,
     });
 
     dispatch(fetchDocumentsAsync());
+
+    // 문서 삭제 후 홈으로 이동?
   } catch (e) {
     console.error(e);
   }
