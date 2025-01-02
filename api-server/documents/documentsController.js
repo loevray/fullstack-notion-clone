@@ -14,7 +14,6 @@ async function getDocumentController(req, res) {
 
   try {
     result = await getDocumentById(documentId);
-    console.log(result);
   } catch (e) {
     const { status, message } = handleErrors(e);
     result = { message };
@@ -28,76 +27,39 @@ async function getDocumentController(req, res) {
 }
 
 async function getDocumentListController(req, res) {
-  let httpStatus = 200;
-  let result;
-
-  try {
-    result = await getDocuments();
-  } catch (e) {
-    const { status, message } = handleErrors(e);
-    result = { message };
-    httpStatus = status;
-  }
-
-  res.writeHead(httpStatus);
+  const document = await getDocuments();
+  res.writeHead(200);
   return res.end(JSON.stringify(result));
 }
 
 async function createDocumentController(req, res) {
-  const { parent, title } = req.body;
+  const { parent } = req.body;
 
-  let httpStatus = 201; // Created
-  let result;
+  const createdDocument = await createDocument({ parentId: +parent });
 
-  try {
-    result = await createDocument({ parentId: +parent });
-  } catch (e) {
-    const { status, message } = handleErrors(e);
-    result = { message };
-    httpStatus = status;
-  }
-
-  res.writeHead(httpStatus);
-  return res.end(JSON.stringify(result));
+  res.writeHead(201);
+  return res.end(JSON.stringify(createdDocument));
 }
 
 async function updateDocumentController(req, res) {
   const { title, content } = req.body;
   const documentId = req.params.id;
 
-  let httpStatus = 200;
-  let result;
+  const updatedDocument = await updateDocument({
+    documentId,
+    newDocument: { title, content },
+  });
 
-  try {
-    result = await updateDocument({
-      documentId,
-      newDocument: { title, content },
-    });
-  } catch (e) {
-    const { status, message } = handleErrors(e);
-    result = { message };
-    httpStatus = status;
-  }
-
-  res.writeHead(httpStatus);
-  return res.end(JSON.stringify(result));
+  res.writeHead(200);
+  return res.end(JSON.stringify(updatedDocument));
 }
 
 async function deleteDocumentController(req, res) {
   const documentId = req.params.id;
-  let httpStatus = 204; // No Content
-  let result;
+  await deleteDocument(documentId);
 
-  try {
-    await deleteDocument(documentId);
-  } catch (e) {
-    const { status, message } = handleErrors(e);
-    httpStatus = status;
-    result = { message };
-  }
-
-  res.writeHead(httpStatus);
-  return res.end(JSON.stringify(result));
+  res.writeHead(204);
+  return res.end(JSON.stringify(documentId));
 }
 
 module.exports = {

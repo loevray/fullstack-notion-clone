@@ -55,7 +55,7 @@ const router = () => {
   };
 
   // 동적 경로에서 추출한 params를 반환하는 함수
-  const getParams = (route) => {
+  const getParams = (route, match) => {
     let params = {};
     const paramNames = route.split("/").filter((part) => part.startsWith(":"));
 
@@ -130,7 +130,7 @@ const router = () => {
 
       // 정규식에서 추출된 값들을 req.params에 할당
       if (match) {
-        req.params = getParams(route);
+        req.params = getParams(route, match);
       }
 
       // 미들웨어 실행

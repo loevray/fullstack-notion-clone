@@ -9,25 +9,35 @@ const {
 } = require("./documents/documentsController");
 const cors = require("./middlewares/cors");
 const bodyParser = require("./middlewares/bodyParser");
+const handleErrors = require("./documents/customErrors/handleErrors");
 
 const PORT = 4000;
 
 const documentsRouter = router();
 
-documentsRouter.get("/documents", getDocumentListController);
-documentsRouter.get("/documents/:id", getDocumentController);
-documentsRouter.put("/documents/:id", updateDocumentController);
-documentsRouter.delete("/documents/:id", deleteDocumentController);
-documentsRouter.post("/documents", createDocumentController);
+const wrapAsync = (fn) => (req, res, next) => fn(req, res, next).catch(next);
+
+documentsRouter.get("/documents", wrapAsync(getDocumentListController));
+documentsRouter.get("/documents/:id", wrapAsync(getDocumentController));
+documentsRouter.put("/documents/:id", wrapAsync(updateDocumentController));
+documentsRouter.delete("/documents/:id", wrapAsync(deleteDocumentController));
+documentsRouter.post("/documents", wrapAsync(createDocumentController));
 
 const logMiddleware = (req, res, next) => {
   console.log(`메서드:${req.method}는 링크:${req.url} 접속시 실행됨`);
   next();
 };
 
+const errorHandler = (err, req, res, next) => {
+  const { status, message } = handleErrors(err);
+  res.writeHead(status);
+  res.end(JSON.stringify({ message }));
+};
+
 documentsRouter.use(logMiddleware);
 documentsRouter.use(cors);
 documentsRouter.use(bodyParser);
+documentsRouter.use(errorHandler);
 
 const server = createServer((req, res) => {
   documentsRouter.handleRequest(req, res);
