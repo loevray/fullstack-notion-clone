@@ -17,6 +17,7 @@ async function getDocumentController(req, res) {
 
 async function getDocumentListController(req, res) {
   const documentList = await getDocuments();
+  console.log(documentList);
   res.writeHead(200);
   return res.end(JSON.stringify(documentList));
 }
@@ -48,7 +49,7 @@ async function deleteDocumentController(req, res) {
   await deleteDocument(documentId);
 
   res.writeHead(204);
-  return res.end(JSON.stringify(documentId));
+  return res.end(JSON.stringify({ documentId }));
 }
 
 module.exports = {

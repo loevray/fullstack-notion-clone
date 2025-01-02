@@ -91,7 +91,7 @@ async function createDocument({ parentId = null }) {
 
 async function updateDocument({ documentId, newDocument }) {
   const db = await connectDB();
-  if (newDocument.ctitle.length >= 20) {
+  if (newDocument.title.length >= 20) {
     throw new ValidationError("제목은 20자 이하여야 합니다.");
   }
 
@@ -180,6 +180,10 @@ async function generateDocumentPath({ parentId, currentPath }) {
   //자식으로 문서를 생성하는 경우
   if (!currentPath) {
     const parentDoc = await findParentDocument(parentId);
+
+    //부모문서가 루트문서면, 부모문서의 materializedPath가 없다.
+    if (parentDoc.materializedPath === null) return `${parentId},`;
+
     return `${parentDoc.materializedPath}${parentId},`;
   }
 
