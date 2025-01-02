@@ -62,6 +62,8 @@ const router = () => {
     paramNames.forEach((param, index) => {
       params[param.substring(1)] = match[index + 1]; // :id 등
     });
+
+    return params;
   };
 
   // 라우터에 경로를 등록하는 함수

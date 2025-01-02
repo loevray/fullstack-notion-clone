@@ -9,27 +9,16 @@ const {
 
 async function getDocumentController(req, res) {
   const documentId = req.params.id;
-  let httpStatus = 200;
-  let result;
+  const document = await getDocumentById(documentId);
 
-  try {
-    result = await getDocumentById(documentId);
-  } catch (e) {
-    const { status, message } = handleErrors(e);
-    result = { message };
-    httpStatus = status;
-  }
-
-  console.log(JSON.stringify(result));
-
-  res.writeHead(httpStatus);
-  return res.end(JSON.stringify(result));
+  res.writeHead(200);
+  return res.end(JSON.stringify(document));
 }
 
 async function getDocumentListController(req, res) {
-  const document = await getDocuments();
+  const documentList = await getDocuments();
   res.writeHead(200);
-  return res.end(JSON.stringify(result));
+  return res.end(JSON.stringify(documentList));
 }
 
 async function createDocumentController(req, res) {
