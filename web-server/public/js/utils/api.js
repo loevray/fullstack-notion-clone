@@ -10,11 +10,19 @@ export const request = async (url, options = {}) => {
         ...options,
       }
     );
+
+    let result;
+
+    result = await res.json();
+
     if (res.ok) {
-      return await res.json();
+      return result;
     }
-    throw new Error(`http통신중 오류발생 : ${res.status}`);
+
+    console.log(
+      `서버로부터 응답 오류가 발생했습니다.code: ${res.status}, message: ${result.message}`
+    );
   } catch (e) {
-    console.log(`api불러오다가 오류 캐치 : ${e}`);
+    console.log(`서버와의 통신 장애 발생 : ${e}`);
   }
 };
