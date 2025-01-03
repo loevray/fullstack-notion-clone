@@ -1,4 +1,4 @@
-const handleErrors = require("./customErrors/handleErrors");
+const handleErrors = require("./utils/handleErrors");
 const {
   createDocument,
   getDocumentById,

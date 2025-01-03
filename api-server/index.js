@@ -9,7 +9,7 @@ const {
 } = require("./documents/documentsController");
 const cors = require("./middlewares/cors");
 const bodyParser = require("./middlewares/bodyParser");
-const handleErrors = require("./documents/customErrors/handleErrors");
+const handleErrors = require("./documents/utils/handleErrors");
 
 const PORT = 4000;
 

@@ -84,8 +84,6 @@ async function createDocument({ parentId = null }) {
     throw new DatabaseError(`Failed to create document: ${e.message}`);
   }
 
-  console.log(result);
-
   return await getDocumentById(result.insertedId);
 }
 
