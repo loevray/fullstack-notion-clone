@@ -17,7 +17,6 @@ async function getDocumentController(req, res) {
 
 async function getDocumentListController(req, res) {
   const documentList = await getDocuments();
-  console.log(documentList);
   res.writeHead(200);
   return res.end(JSON.stringify(documentList));
 }
