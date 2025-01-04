@@ -1,5 +1,5 @@
 const { createServer } = require("node:http");
-const router = require("./router");
+const router = require("./router/router");
 const {
   getDocumentListController,
   createDocumentController,

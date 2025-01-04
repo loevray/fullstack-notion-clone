@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const DatabaseError = require("../documents/customErrors/databaseError");
+const DatabaseError = require("../customErrors/databaseError");
 
 const uri = "mongodb://localhost:27017"; // MongoDB URI
 let client;

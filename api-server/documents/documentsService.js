@@ -1,7 +1,7 @@
 const { connectDB } = require("../models/db");
-const DatabaseError = require("./customErrors/databaseError");
-const NotFoundError = require("./customErrors/notFoundError");
-const ValidationError = require("./customErrors/validationError");
+const DatabaseError = require("../customErrors/databaseError");
+const NotFoundError = require("../customErrors/notFoundError");
+const ValidationError = require("../customErrors/validationError");
 const buildTreeFromMaterializedPath = require("./utils/buildTreeFromMaterializedPath");
 const getToday = require("./utils/getToday");
 

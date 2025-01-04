@@ -1,10 +1,10 @@
-const DatabaseError = require("../customErrors/databaseError");
-const NotFoundError = require("../customErrors/notFoundError");
-const ValidationError = require("../customErrors/validationError");
+const DatabaseError = require("../../customErrors/databaseError");
+const NotFoundError = require("../../customErrors/notFoundError");
+const ValidationError = require("../../customErrors/validationError");
 
 describe("handleErrors", () => {
   const handleErrors = require("./handleErrors");
-  const CustomError = require("../customErrors/customError");
+  const CustomError = require("../../customErrors/customError");
 
   it("should return status and message when error is instance of CustomError", () => {
     const err = new CustomError({ status: 401, message: "Custom Error" });
