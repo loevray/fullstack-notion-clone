@@ -4,25 +4,28 @@ const NotFoundError = require("../../customErrors/notFoundError");
 const ValidationError = require("../../customErrors/validationError");
 const buildTreeFromMaterializedPath = require("./utils/buildTreeFromMaterializedPath");
 const getToday = require("./utils/getToday");
+const { DatabaseConstants } = require("../../constants/database");
 
-const COLLECTION_NAME = "documents";
+const { DOCUMENTS_COLLECTION, COUNTERS_COLLECTION, SEQUENCE_VALUE } =
+  DatabaseConstants;
+const { DEFAULT_CONTENT, DEFAULT_TITLE } = require("../../constants/document");
 
 async function getNextSequenceValue(collectionName) {
   const db = await connectDB();
 
   try {
-    const result = await db.collection("counters").findOneAndUpdate(
+    const result = await db.collection(COUNTERS_COLLECTION).findOneAndUpdate(
       { _id: collectionName },
-      { $inc: { sequence_value: 1 } },
+      { $inc: { [SEQUENCE_VALUE]: 1 } },
       {
         returnDocument: "after",
         returnOriginal: false,
         upsert: true,
-        projection: { sequence_value: 1 },
+        projection: { [SEQUENCE_VALUE]: 1 },
       }
     );
 
-    return result.sequence_value;
+    return result[SEQUENCE_VALUE];
   } catch (e) {
     throw new DatabaseError(`Failed to get next sequence value: ${e.message}`);
   }
@@ -32,7 +35,10 @@ async function getDocuments() {
   const db = await connectDB();
 
   try {
-    const documents = await db.collection(COLLECTION_NAME).find().toArray();
+    const documents = await db
+      .collection(DOCUMENTS_COLLECTION)
+      .find()
+      .toArray();
 
     return buildTreeFromMaterializedPath(documents);
   } catch (e) {
@@ -44,7 +50,7 @@ async function getDocumentById(id) {
   const db = await connectDB();
 
   try {
-    const document = await db.collection(COLLECTION_NAME).findOne(
+    const document = await db.collection(DOCUMENTS_COLLECTION).findOne(
       { _id: +id },
       {
         projection: { _id: 0 },
@@ -62,15 +68,15 @@ async function getDocumentById(id) {
 
 async function createDocument({ parentId = null }) {
   const db = await connectDB();
-  const nextId = await getNextSequenceValue(COLLECTION_NAME);
+  const nextId = await getNextSequenceValue(DOCUMENTS_COLLECTION);
   const materializedPath = await generateDocumentPath({ parentId });
   const today = getToday();
 
   const newDocument = {
     _id: nextId,
     id: nextId,
-    title: "제목없음",
-    content: "",
+    title: DEFAULT_TITLE,
+    content: DEFAULT_CONTENT,
     materializedPath,
     createdAt: today,
     updatedAt: today,
@@ -79,7 +85,7 @@ async function createDocument({ parentId = null }) {
   let result;
 
   try {
-    result = await db.collection(COLLECTION_NAME).insertOne(newDocument);
+    result = await db.collection(DOCUMENTS_COLLECTION).insertOne(newDocument);
   } catch (e) {
     throw new DatabaseError(`Failed to create document: ${e.message}`);
   }
@@ -94,7 +100,7 @@ async function updateDocument({ documentId, newDocument }) {
   }
 
   try {
-    const result = await db.collection(COLLECTION_NAME).findOneAndUpdate(
+    const result = await db.collection(DOCUMENTS_COLLECTION).findOneAndUpdate(
       { _id: +documentId },
       {
         $set: {
@@ -115,7 +121,7 @@ async function getChildDocuments(parentId) {
 
   try {
     return await db
-      .collection(COLLECTION_NAME)
+      .collection(DOCUMENTS_COLLECTION)
       .find({
         materializedPath: { $regex: `,${parentId},` },
       })
@@ -159,7 +165,7 @@ async function findParentDocument(parentId) {
 
   try {
     const parentDoc = await db
-      .collection(COLLECTION_NAME)
+      .collection(DOCUMENTS_COLLECTION)
       .findOne({ _id: +parentId });
 
     if (!parentDoc)
@@ -208,7 +214,7 @@ async function deleteDocument(id) {
 
   // 문서 삭제
   try {
-    return await db.collection(COLLECTION_NAME).deleteOne({ _id: +id });
+    return await db.collection(DOCUMENTS_COLLECTION).deleteOne({ _id: +id });
   } catch (e) {
     throw new DatabaseError(`Failed to delete document: ${e.message}`);
   }

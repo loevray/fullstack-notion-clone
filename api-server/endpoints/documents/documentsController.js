@@ -1,4 +1,3 @@
-const handleErrors = require("./utils/handleErrors");
 const {
   createDocument,
   getDocumentById,

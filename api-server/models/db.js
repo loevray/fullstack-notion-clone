@@ -3,7 +3,7 @@ const DatabaseError = require("../customErrors/databaseError");
 
 const uri = "mongodb://localhost:27017"; // MongoDB URI
 let client;
-const dbName = "notion_clone";
+const { DATABASE_NAME } = require("../constants/database");
 
 let db;
 
@@ -15,7 +15,7 @@ const connectDB = async () => {
         useUnifiedTopology: true,
       });
       await client.connect();
-      db = client.db(dbName);
+      db = client.db(DATABASE_NAME);
     }
 
     return db;
