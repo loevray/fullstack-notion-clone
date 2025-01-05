@@ -6,6 +6,7 @@ const buildTreeFromMaterializedPath = require("../utils/buildTreeFromMaterialize
 const getToday = require("../utils/getToday");
 const { DatabaseConstants } = require("../../../constants/database");
 const { DocumentConstants } = require("../../../constants/document");
+const generateDocumentPath = require("../utils/generateDocumentPath");
 
 const { DOCUMENTS_COLLECTION, COUNTERS_COLLECTION, SEQUENCE_VALUE } =
   DatabaseConstants;

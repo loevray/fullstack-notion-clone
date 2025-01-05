@@ -3,7 +3,8 @@ const DatabaseError = require("../customErrors/databaseError");
 
 const uri = "mongodb://localhost:27017"; // MongoDB URI
 let client;
-const { DATABASE_NAME } = require("../constants/database");
+const { DatabaseConstants } = require("../constants/database");
+const { DATABASE_NAME } = DatabaseConstants;
 
 let db;
 
