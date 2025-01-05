@@ -15,6 +15,15 @@ describe("generateDocumentPath unit test", () => {
     expect(path).toBe(",1,");
   });
 
+  it("should generate correct path for child document", () => {
+    const path = generateDocumentPath({
+      parentId: 3,
+      parentPath: ",1,4,7,",
+    });
+
+    expect(path).toBe(",1,4,7,3,");
+  });
+
   it("should update path correctly when ancestor document is deleted", () => {
     const path = generateDocumentPath({
       parentId: 1,

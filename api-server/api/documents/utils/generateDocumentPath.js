@@ -7,7 +7,7 @@ function generateDocumentPath({ parentId, currentPath, parentPath }) {
     //부모가 루트문서라면
     if (!parentPath) return `,${parentId},`;
 
-    return `${parentPath}${parentId}`;
+    return `${parentPath}${parentId},`;
   }
 
   //조상문서 삭제후 자식문서들의 경로를 업데이트
