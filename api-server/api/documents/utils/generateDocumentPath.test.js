@@ -9,7 +9,7 @@ describe("generateDocumentPath unit test", () => {
   it("should generate correct path for root document", () => {
     const path = generateDocumentPath({
       parentId: 1,
-      currentPath: null,
+      childPath: null,
     });
 
     expect(path).toBe(",1,");
@@ -28,7 +28,7 @@ describe("generateDocumentPath unit test", () => {
     const path = generateDocumentPath({
       parentId: 1,
       parentPath: ",1,",
-      currentPath: ",1,2,3,",
+      childPath: ",1,2,3,",
     });
 
     expect(path).toBe(",2,3,");
