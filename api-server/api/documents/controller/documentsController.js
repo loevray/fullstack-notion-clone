@@ -4,7 +4,7 @@ const {
   getDocuments,
   updateDocument,
   deleteDocument,
-} = require("./documentsService");
+} = require("../service/documentsService");
 
 async function getDocumentController(req, res) {
   const documentId = req.params.id;

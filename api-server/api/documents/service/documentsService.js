@@ -1,14 +1,17 @@
-const { connectDB } = require("../../models/db");
-const DatabaseError = require("../../customErrors/databaseError");
-const NotFoundError = require("../../customErrors/notFoundError");
-const ValidationError = require("../../customErrors/validationError");
-const buildTreeFromMaterializedPath = require("./utils/buildTreeFromMaterializedPath");
-const getToday = require("./utils/getToday");
-const { DatabaseConstants } = require("../../constants/database");
+const { connectDB } = require("../../../models/db");
+const DatabaseError = require("../../../customErrors/databaseError");
+const NotFoundError = require("../../../customErrors/notFoundError");
+const ValidationError = require("../../../customErrors/validationError");
+const buildTreeFromMaterializedPath = require("../utils/buildTreeFromMaterializedPath");
+const getToday = require("../utils/getToday");
+const { DatabaseConstants } = require("../../../constants/database");
 
 const { DOCUMENTS_COLLECTION, COUNTERS_COLLECTION, SEQUENCE_VALUE } =
   DatabaseConstants;
-const { DEFAULT_CONTENT, DEFAULT_TITLE } = require("../../constants/document");
+const {
+  DEFAULT_CONTENT,
+  DEFAULT_TITLE,
+} = require("../../../constants/document");
 
 async function getNextSequenceValue(collectionName) {
   const db = await connectDB();
