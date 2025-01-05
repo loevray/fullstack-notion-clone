@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:unit": "jest --testPathIgnorePatterns='\\.integration\\.test\\.js$'",
+    "test:integration": "jest --testMatch='**/*.integration.test.js'",
     "start": "nodemon index.js"
   },
   "keywords": [],
