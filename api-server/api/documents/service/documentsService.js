@@ -106,7 +106,8 @@ async function createDocument({ parentId = null }) {
 
 async function updateDocument({ documentId, newDocument }) {
   const db = await connectDB();
-  if (newDocument.title.length >= 20) {
+
+  if (newDocument.title?.length >= 20) {
     throw new ValidationError("제목은 20자 이하여야 합니다.");
   }
 
@@ -143,13 +144,9 @@ async function getChildDocuments(parentId) {
 }
 
 async function updateDescendantsPath(parentDoc, childDoc) {
-  //트랜잭션을 사용하여 업데이트를 안전하게 처리하는 방안 필요.
-
-  // 새로운 경로 생성
-
   const newPath = generateDocumentPath({
-    parentId: parentDoc._id,
-    currentPath: childDoc.materializedPath,
+    parentId: parentDoc.id,
+    childPath: childDoc.materializedPath,
     parentPath: parentDoc.materializedPath,
   });
 
@@ -158,17 +155,6 @@ async function updateDescendantsPath(parentDoc, childDoc) {
     documentId: childDoc._id,
     newDocument: { materializedPath: newPath },
   });
-
-  // 자식 문서 재귀 처리
-  const grandChildren = await getChildDocuments(childDoc._id);
-
-  if (grandChildren.length > 0) {
-    await Promise.all(
-      grandChildren.map((grandChild) =>
-        updateDescendantsPath(childDoc, grandChild)
-      )
-    );
-  }
 }
 
 async function deleteDocument(id) {
@@ -181,6 +167,7 @@ async function deleteDocument(id) {
 
   const childDocuments = await getChildDocuments(id);
 
+  //트랜잭션 이용해서 자식 경로 안전하게 처리하는 방법이 필요
   if (childDocuments.length > 0) {
     await Promise.all(
       childDocuments.map((childDoc) =>
