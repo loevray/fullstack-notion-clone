@@ -5,13 +5,12 @@ const ValidationError = require("../../../customErrors/validationError");
 const buildTreeFromMaterializedPath = require("../utils/buildTreeFromMaterializedPath");
 const getToday = require("../utils/getToday");
 const { DatabaseConstants } = require("../../../constants/database");
+const { DocumentConstants } = require("../../../constants/document");
 
 const { DOCUMENTS_COLLECTION, COUNTERS_COLLECTION, SEQUENCE_VALUE } =
   DatabaseConstants;
-const {
-  DEFAULT_CONTENT,
-  DEFAULT_TITLE,
-} = require("../../../constants/document");
+
+const { DEFAULT_CONTENT, DEFAULT_TITLE } = DocumentConstants;
 
 async function getNextSequenceValue(collectionName) {
   const db = await connectDB();
@@ -72,7 +71,15 @@ async function getDocumentById(id) {
 async function createDocument({ parentId = null }) {
   const db = await connectDB();
   const nextId = await getNextSequenceValue(DOCUMENTS_COLLECTION);
-  const materializedPath = await generateDocumentPath({ parentId });
+
+  let parentDoc;
+  if (parentId) parentDoc = await getDocumentById(parentId);
+
+  const materializedPath = generateDocumentPath({
+    parentId,
+    parentPath: parentDoc?.materializedPath,
+  });
+
   const today = getToday();
 
   const newDocument = {
@@ -134,13 +141,15 @@ async function getChildDocuments(parentId) {
   }
 }
 
-async function updateDescendantsPath(childDoc, parentId) {
+async function updateDescendantsPath(parentDoc, childDoc) {
   //트랜잭션을 사용하여 업데이트를 안전하게 처리하는 방안 필요.
 
   // 새로운 경로 생성
-  const newPath = await generateDocumentPath({
-    parentId,
+
+  const newPath = generateDocumentPath({
+    parentId: parentDoc._id,
     currentPath: childDoc.materializedPath,
+    parentPath: parentDoc.materializedPath,
   });
 
   // 문서 업데이트
@@ -155,48 +164,10 @@ async function updateDescendantsPath(childDoc, parentId) {
   if (grandChildren.length > 0) {
     await Promise.all(
       grandChildren.map((grandChild) =>
-        updateDescendantsPath(grandChild, parentId)
+        updateDescendantsPath(childDoc, grandChild)
       )
     );
   }
-}
-
-async function findParentDocument(parentId) {
-  if (!parentId) return null;
-
-  const db = await connectDB();
-
-  try {
-    const parentDoc = await db
-      .collection(DOCUMENTS_COLLECTION)
-      .findOne({ _id: +parentId });
-
-    if (!parentDoc)
-      throw new NotFoundError(`부모 문서${parentId}를 찾을 수 없습니다!`);
-
-    return parentDoc;
-  } catch (e) {
-    throw new DatabaseError(`Failed to find parent document: ${e.message}`);
-  }
-}
-
-async function generateDocumentPath({ parentId, currentPath }) {
-  //루트에 문서를 생성하는 경우
-  if (!parentId) return null;
-
-  //자식으로 문서를 생성하는 경우
-  if (!currentPath) {
-    const parentDoc = await findParentDocument(parentId);
-
-    //부모문서가 루트문서면, 부모문서의 materializedPath가 없다.
-    if (parentDoc.materializedPath === null) return `${parentId},`;
-
-    return `${parentDoc.materializedPath}${parentId},`;
-  }
-
-  //조상문서 삭제시 자식문서들의 경로를 업데이트하는 경우
-  let newPath = currentPath.replace(`,${parentId},`, ",");
-  return newPath === "," ? null : newPath;
 }
 
 async function deleteDocument(id) {
@@ -211,7 +182,9 @@ async function deleteDocument(id) {
 
   if (childDocuments.length > 0) {
     await Promise.all(
-      childDocuments.map((childDoc) => updateDescendantsPath(childDoc, id))
+      childDocuments.map((childDoc) =>
+        updateDescendantsPath(documentToDelete, childDoc)
+      )
     );
   }
 

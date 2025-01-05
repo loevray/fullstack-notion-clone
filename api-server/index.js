@@ -6,10 +6,10 @@ const {
   getDocumentController,
   updateDocumentController,
   deleteDocumentController,
-} = require("./endpoints/documents/documentsController");
+} = require("./api/documents/controller/documentsController");
 const cors = require("./middlewares/cors");
 const bodyParser = require("./middlewares/bodyParser");
-const handleErrors = require("./endpoints/documents/utils/handleErrors");
+const handleErrors = require("./api/documents/utils/handleErrors");
 
 const PORT = 4000;
 
