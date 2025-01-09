@@ -48,62 +48,38 @@ describe("Document Service tests", () => {
   // 공통 데이터 생성 함수
   const setupTestData = async () => {
     await createDocument({
-      document: {
-        title: "제목1",
-        content: "내용1",
-        createdAt: getToday(),
-        updatedAt: getToday(),
-      },
+      title: "제목1",
     });
 
     await createDocument({
       parentId: 1,
-      document: {
-        title: "제목2",
-        content: "내용2",
-        createdAt: getToday(),
-        updatedAt: getToday(),
-      },
+      title: "제목2",
     });
 
     await createDocument({
       parentId: 1,
-      document: {
-        title: "제목3",
-        content: "내용3",
-        createdAt: getToday(),
-        updatedAt: getToday(),
-      },
+      title: "제목3",
     });
 
     await createDocument({
       parentId: 3,
-      document: {
-        title: "제목4",
-        content: "내용4",
-        createdAt: getToday(),
-        updatedAt: getToday(),
-      },
+      title: "제목4",
     });
   };
 
   it("should insert a document into the collection", async () => {
     const mockDocument = {
       id: 1,
-      title: "제목 인데용?",
-      content: "내용 인데용?",
-      createdAt: getToday(),
-      updatedAt: getToday(),
+      title: "제목 없음",
+      content: "",
+      createdAt: "2024-12-15-19:52:00",
+      updatedAt: "2024-12-15-19:52:00",
+      materializedPath: null,
     };
 
-    await createDocument({ document: mockDocument });
+    const createdDocument = await createDocument({});
 
-    const insertedDocument = await getDocumentById(1);
-
-    expect({ ...insertedDocument }).toEqual({
-      ...mockDocument,
-      path: null,
-    });
+    expect(createdDocument).toEqual(mockDocument);
   });
 
   it("should get document list", async () => {
@@ -113,24 +89,24 @@ describe("Document Service tests", () => {
       {
         id: 1,
         title: "제목1",
-        path: null,
+        materializedPath: null,
         documents: [
           {
             id: 2,
             title: "제목2",
             documents: [],
-            path: ",1,",
+            materializedPath: ",1,",
           },
           {
             id: 3,
             title: "제목3",
-            path: ",1,",
+            materializedPath: ",1,",
             documents: [
               {
                 id: 4,
                 title: "제목4",
                 documents: [],
-                path: ",1,3,",
+                materializedPath: ",1,3,",
               },
             ],
           },
@@ -145,8 +121,6 @@ describe("Document Service tests", () => {
   it("should move child documents to upper hierarchy when parentId is deleted", async () => {
     await setupTestData();
 
-    const origin = await getDocuments();
-
     await deleteDocument(1);
 
     const expectedDocumentList = [
@@ -154,18 +128,18 @@ describe("Document Service tests", () => {
         id: 2,
         title: "제목2",
         documents: [],
-        path: null,
+        materializedPath: null,
       },
       {
         id: 3,
         title: "제목3",
-        path: null,
+        materializedPath: null,
         documents: [
           {
             id: 4,
             title: "제목4",
             documents: [],
-            path: ",3,",
+            materializedPath: ",3,",
           },
         ],
       },
@@ -182,7 +156,7 @@ describe("Document Service tests", () => {
     const newDocument = {
       title: "제목4",
       content: "내용444444ㅋㅋㅋ",
-      path: ",1,3,",
+      materializedPath: ",1,3,",
       createdAt: getToday(),
       updatedAt: getToday(),
     };
