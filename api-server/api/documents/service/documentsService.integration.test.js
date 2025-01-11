@@ -1,12 +1,15 @@
 const { MongoClient } = require("mongodb");
 
+const documentsService = require("./documentsService.js");
+
 const {
   getDocuments,
   getDocumentById,
   createDocument,
   updateDocument,
   deleteDocument,
-} = require("./documentsService.js");
+} = documentsService();
+
 const { _internal } = require("../../../models/db.js");
 const getToday = require("../utils/getToday.js");
 
