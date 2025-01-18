@@ -7,6 +7,7 @@ class DocumentsRepository {
   constructor(db) {
     this.db = db;
   }
+
   async getNewDocumentId() {
     return await this.db.collection(COUNTERS_COLLECTION).findOneAndUpdate(
       { _id: DOCUMENTS_COLLECTION },
@@ -15,7 +16,7 @@ class DocumentsRepository {
         returnDocument: "after",
         returnOriginal: false,
         upsert: true,
-        projection: { [SEQUENCE_VALUE]: 1 },
+        projection: { [SEQUENCE_VALUE]: 1, _id: 0 },
       }
     );
   }
