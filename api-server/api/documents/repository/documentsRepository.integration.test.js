@@ -123,4 +123,52 @@ describe("DocumentsRepository Tests", () => {
 
     expect(fetchedDocuments).toEqual(documents);
   });
+
+  it("delete document", async () => {
+    const newDocument = {
+      _id: 1,
+      title: "Test Document",
+      content: "This is a test document.",
+      materializedPath: "1,",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await documentsRepository.createDocument(newDocument);
+    await documentsRepository.deleteDocument(1);
+    const fetchedDocument = await documentsRepository.getDocumentById(1);
+
+    expect(fetchedDocument).toBeNull();
+  });
+
+  it("get child documents", async () => {
+    const parentDocument = {
+      _id: 1,
+      id: 1,
+      title: "Parent Document",
+      content: "This is a parent document.",
+      materializedPath: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const childDocument = {
+      _id: 2,
+      id: 2,
+      title: "Child Document",
+      content: "This is a child document.",
+      materializedPath: ",1,",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await documentsRepository.createDocument(parentDocument);
+    await documentsRepository.createDocument(childDocument);
+
+    const fetchedChildDocuments = await documentsRepository.getChildDocuments(
+      1
+    );
+
+    expect(fetchedChildDocuments).toEqual([childDocument]);
+  });
 });
