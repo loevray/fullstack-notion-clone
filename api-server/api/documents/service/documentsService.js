@@ -8,7 +8,7 @@ const { DatabaseConstants } = require("../../../constants/database");
 const { DocumentConstants } = require("../../../constants/document");
 const generateDocumentPath = require("../utils/generateDocumentPath");
 
-const { DOCUMENTS_COLLECTION } = DatabaseConstants;
+const { DOCUMENTS_COLLECTION, SEQUENCE_VALUE } = DatabaseConstants;
 
 const { DEFAULT_CONTENT, DEFAULT_TITLE } = DocumentConstants;
 
@@ -39,7 +39,7 @@ class DocumentsService {
   }
 
   async createDocument({ title = DEFAULT_TITLE, parentId = null }) {
-    const newId = await this.repository.getNewDocumentId();
+    const newId = (await this.repository.getNewDocumentId())[SEQUENCE_VALUE];
 
     let parentDoc;
     if (parentId) parentDoc = await this.repository.getDocumentById(parentId);
@@ -100,15 +100,13 @@ class DocumentsService {
     });
 
     // 문서 업데이트
-    await this.repository.updateDocument({
-      documentId: childDoc._id,
-      newDocument: { materializedPath: newPath },
+    await this.repository.updateDocument(childDoc._id, {
+      materializedPath: newPath,
     });
   }
 
   async deleteDocument(id) {
-    const db = await connectDB();
-    const documentToDelete = await getDocumentById(id);
+    const documentToDelete = await this.repository.getDocumentById(id);
 
     if (!documentToDelete) {
       throw new NotFoundError(`${id}번째 문서를 찾을 수 없습니다!`);
@@ -120,17 +118,13 @@ class DocumentsService {
     if (childDocuments.length > 0) {
       await Promise.all(
         childDocuments.map((childDoc) =>
-          updateChildMaterializedPath(documentToDelete, childDoc)
+          this.updateChildMaterializedPath(documentToDelete, childDoc)
         )
       );
     }
 
     // 문서 삭제
-    try {
-      return await db.collection(DOCUMENTS_COLLECTION).deleteOne({ _id: +id });
-    } catch (e) {
-      throw new DatabaseError(`Failed to delete document: ${e.message}`);
-    }
+    return await this.repository.deleteDocument(id);
   }
 }
 

@@ -1,42 +1,61 @@
 const { MongoClient } = require("mongodb");
 
-const documentsService = require("./documentsService.js");
-
-const {
-  getDocuments,
-  getDocumentById,
-  createDocument,
-  updateDocument,
-  deleteDocument,
-} = documentsService();
-
-const { _internal } = require("../../../models/db.js");
 const getToday = require("../utils/getToday.js");
+const DocumentsService = require("./documentsService.js");
+const DocumentsRepository = require("../repository/documentsRepository.js");
 
 const mockDate = new Date(2024, 11, 15, 19, 52, 0);
 
 jest.useFakeTimers({ doNotFake: ["nextTick"] }).setSystemTime(mockDate);
 
 describe("Document Service tests", () => {
-  let client;
   let connection;
   let db;
+  let documentsService;
+  let createDocument,
+    getDocuments,
+    deleteDocument,
+    updateDocument,
+    getDocumentById;
+  let setupTestData;
 
   beforeAll(async () => {
-    client = new MongoClient(globalThis.__MONGO_URI__);
-
-    connection = await client.connect({
+    connection = await MongoClient.connect(globalThis.__MONGO_URI__, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    db = connection.db(globalThis.__MONGO_DB_NAME__);
-    _internal.setClient(client);
-    _internal.setDb(db);
+    db = await connection.db(globalThis.__MONGO_DB_NAME__);
 
-    await db
-      .collection("counters")
-      .insertOne({ _id: "documents", sequence_value: 0 });
+    const documentsRepository = new DocumentsRepository(db);
+    documentsService = new DocumentsService(documentsRepository);
+
+    createDocument = documentsService.createDocument.bind(documentsService);
+    getDocuments = documentsService.getDocuments.bind(documentsService);
+    deleteDocument = documentsService.deleteDocument.bind(documentsService);
+    updateDocument = documentsService.updateDocument.bind(documentsService);
+    getDocumentById = documentsService.getDocumentById.bind(documentsService);
+
+    setupTestData = async () => {
+      await createDocument({
+        title: "제목1",
+      });
+
+      await createDocument({
+        parentId: 1,
+        title: "제목2",
+      });
+
+      await createDocument({
+        parentId: 1,
+        title: "제목3",
+      });
+
+      await createDocument({
+        parentId: 3,
+        title: "제목4",
+      });
+    };
   });
 
   beforeEach(async () => {
@@ -49,26 +68,6 @@ describe("Document Service tests", () => {
   });
 
   // 공통 데이터 생성 함수
-  const setupTestData = async () => {
-    await createDocument({
-      title: "제목1",
-    });
-
-    await createDocument({
-      parentId: 1,
-      title: "제목2",
-    });
-
-    await createDocument({
-      parentId: 1,
-      title: "제목3",
-    });
-
-    await createDocument({
-      parentId: 3,
-      title: "제목4",
-    });
-  };
 
   it("should insert a document into the collection", async () => {
     const mockDocument = {
