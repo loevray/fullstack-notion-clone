@@ -25,15 +25,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = {
-  connectDB,
-  _internal: {
-    setDb: (newDb) => {
-      db = newDb;
-    },
-    setClient: (newClient) => {
-      client = newClient;
-    },
-  },
-  getClient: () => client,
-};
+module.exports = connectDB;
