@@ -1,4 +1,4 @@
-const router = () => {
+const createRouter = () => {
   const routes = {
     GET: {},
     POST: {},
@@ -141,4 +141,4 @@ const router = () => {
   };
 };
 
-module.exports = router;
+module.exports = createRouter;
