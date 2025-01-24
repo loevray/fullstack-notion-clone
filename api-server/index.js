@@ -8,12 +8,9 @@ const DocumentsController = require("./api/documents/controller/documentsControl
 const DocumentsService = require("./api/documents/service/documentsService");
 const DocumentsRepository = require("./api/documents/repository/documentsRepository");
 const connectDB = require("./models/db");
+const wrapAsync = require("./utils/wrapAsync");
 
 const PORT = 4000;
-
-const router = createRouter();
-
-const wrapAsync = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 
 const initServer = async () => {
   try {
