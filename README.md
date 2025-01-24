@@ -145,4 +145,118 @@ interface CustomError extends Error {
 }
 ```
 
+## 테스트
+
+```
+npm run test:unit //유닛테스트
+npm run test:integration //통합테스트
+```
+
+---
+
 ## 프론트엔드
+
+## 상태기반 렌더링
+
+상태값이 변경되면 리렌더링을 일으키는 매커니즘을 적용하였습니다.
+
+```js
+//web-server/public/js/core/Component.js
+
+export default class Component {
+  //...some logics
+  render() {
+    ...
+  }
+
+  setState(nextState) {
+    const prevState = this.state;
+    if (!isEqual(prevState, nextState)) {
+      this.state = validateState(this.state, nextState);
+      this.render();
+    }
+  }
+}
+```
+
+값의 비교, 검증 로직 또한 라이브러리 없이 진행하였습니다.
+
+## 전역 상태관리
+
+`Redux`의 패턴을 유사하게 구현하여 전역상태를 관리하였습니다.
+
+`dispatch => action => store(reducer) => view`
+
+```js
+//web-server/public/js/utils/myRedux/createStore.js
+
+export const createStore = (reducer, middleware) => {
+  const state = {
+    [reducer.name]: observable(reducer(undefined, undefined)),
+  };
+
+  const subscribe = (callback) => {
+    //아직 구현되지 않음
+  };
+
+  const getState = () => Object.freeze(state);
+
+  const dispatch = (action) => {
+    if (getTag(action).includes("Function")) {
+      return middleware({ dispatch, getState })(dispatch)(action);
+    }
+
+    const nextState = reducer(getDeepCopy(state[reducer.name]), action);
+    const stateKeys = Object.keys(state[reducer.name]);
+    stateKeys.forEach((key) => {
+      state[reducer.name][key] = nextState[key];
+    });
+  };
+
+  const useSelector = (selector) => {
+    const selectedState = selector(getState());
+    return selectedState;
+  };
+
+  return { subscribe, dispatch, getState, useSelector };
+};
+```
+
+## 클라이언트 라우팅
+
+`customEvent`와 `popstate`이벤트, `history`를 이용하여 클라이언트측 라우팅을 구현하였습니다.
+
+```js
+//web-server/public/js/utils/handleRouteEvent.js
+
+const ROUTE_CHANGE_EVENT = "route-change";
+
+export const initRouter = (onRoute) => {
+  window.addEventListener(ROUTE_CHANGE_EVENT, (e) => {
+    const { nextUrl, callback } = e.detail;
+    if (nextUrl) {
+      history.pushState(null, null, nextUrl);
+      callback?.();
+      onRoute();
+    }
+  });
+
+  window.addEventListener("popstate", () => onRoute());
+  window.addEventListener("DOMContentLoaded", () => onRoute());
+};
+
+export const push = (nextUrl, callback) => {
+  window.dispatchEvent(
+    new CustomEvent("route-change", {
+      detail: {
+        nextUrl,
+        callback,
+      },
+    })
+  );
+};
+
+export const usePopStateEvent = (callback) => {
+  window.addEventListener("popstate", () => callback());
+};
+```
