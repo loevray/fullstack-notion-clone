@@ -5,6 +5,26 @@
 이 프로젝트는 노션을 풀스택으로 클론코딩하는 프로젝트입니다.
 프론트엔드, 백엔드 모두 순수한 JavaScript로 진행됩니다!
 
+## How to install
+
+Docker를 사용하여 운영 체제에 관계없이 쉽게 실행할 수 있습니다.
+
+### 요구사항
+
+[Docker](https://www.docker.com/) 및 [Docker Compose](https://docs.docker.com/compose/)가 설치되어있어야 합니다.
+
+프로젝트 루트 디렉토리에서 다음 명령어를 실행합니다.
+
+```
+docker-compose up --build
+```
+
+이미지 빌드가 전부 완료되면 아래 링크로 접속합니다.
+
+http://localhost:3000
+
+서버를 정지하고싶다면 `CTRL+C`를 이용해서 즉시 중지하실 수 있습니다.
+
 ## 백엔드
 
 백엔드는 **Node.js**를 이용하여 **계층형 패턴(Layered architecture)**을 적용해 구축합니다.
