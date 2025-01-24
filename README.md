@@ -260,3 +260,9 @@ export const usePopStateEvent = (callback) => {
   window.addEventListener("popstate", () => callback());
 };
 ```
+
+---
+
+## 프로젝트 관련 글
+
+[프로젝트 리팩토링 글](https://velog.io/@loevray/series/%EB%85%B8%EC%85%98%ED%81%B4%EB%A1%A0-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81%EA%B8%B0)
