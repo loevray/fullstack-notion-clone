@@ -1,8 +1,12 @@
+require("dotenv").config();
+
 const { MongoClient } = require("mongodb");
 const DatabaseError = require("../customErrors/databaseError");
 
-const uri = "mongodb://localhost:27017"; // MongoDB URI
+const { MONGODB_URI } = process.env; // MongoDB URI
+
 let client;
+
 const { DatabaseConstants } = require("../constants/database");
 const { DATABASE_NAME } = DatabaseConstants;
 
@@ -11,7 +15,7 @@ let db;
 const connectDB = async () => {
   try {
     if (!db) {
-      client = new MongoClient(uri, {
+      client = new MongoClient(MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
