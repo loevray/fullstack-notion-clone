@@ -3,6 +3,7 @@ import documentsReducer from "./modules/documentsDuck.js";
 import { combineReducers } from "./utils/myRedux/combineReducers.js";
 import { createStore } from "./utils/myRedux/createStore.js";
 import thunk from "./utils/myRedux/thunk.js";
+import style from "../style.css";
 
 const rootReducer = combineReducers({
   documentsReducer,
