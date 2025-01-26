@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npm run start:api-server\" \"npm run start:web-server\"",
-    "start:api-server": "npm run start --prefix api-server",
-    "start:web-server": "npm run start --prefix web-server"
+    "dev": "concurrently \"npm run dev:api-server\" \"npm run dev:web-server\"",
+    "dev:api-server": "npm run dev --prefix api-server",
+    "dev:web-server": "npm run dev --prefix web-server"
   },
   "keywords": [],
   "author": "",
