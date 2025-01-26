@@ -6,7 +6,7 @@ const PORT = 3000;
 const server = http.createServer((req, res) => {
   let filePath = path.join(
     __dirname,
-    req.url === "/" ? "/public/index.html" : req.url
+    req.url === "/" ? "/dist/index.html" : req.url
   );
 
   const extname = path.extname(filePath);
@@ -32,7 +32,7 @@ const server = http.createServer((req, res) => {
     if (err.code === "ENOENT") {
       // html 요청이면 index.html 반환 (SPA 새로고침 대응)
       fs.readFile(
-        path.join(__dirname, "/public/index.html"),
+        path.join(__dirname, "/dist/index.html"),
         (error, indexData) => {
           if (error) {
             res.writeHead(500, { "Content-Type": "text/plain" });
