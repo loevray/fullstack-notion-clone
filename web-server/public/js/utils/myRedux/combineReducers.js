@@ -14,5 +14,6 @@ export const combineReducers = (reducers) => {
     });
     return nextState;
   };
+
   return combinatedReducer;
 };
